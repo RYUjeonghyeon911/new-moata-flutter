@@ -13,9 +13,9 @@ class _RideInputPageState extends State<RideInputPage> {
   final TextEditingController _timeController = TextEditingController();
 
   bool _isInputVisible = true;
-  double _inputHeight = 250; // 기본 높이를 더 위로 설정
-  final double _minHeight = 50; // 완전히 숨겨지지 않도록 최소 높이 설정
-  final double _maxHeight = 200; // 최대 높이
+  double _inputHeight = 270; // 기본 높이를 더 위로 설정
+  final double _minHeight = 70; // 완전히 숨겨지지 않도록 최소 높이 설정
+  final double _maxHeight = 220; // 최대 높이
 
   void toggleInputVisibility() {
     setState(() {

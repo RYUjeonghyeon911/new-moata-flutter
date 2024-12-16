@@ -1,4 +1,4 @@
-package com.example.flutter_moata
+package com.example.moata
 
 import io.flutter.embedding.android.FlutterActivity
 

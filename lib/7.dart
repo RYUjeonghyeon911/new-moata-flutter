@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '8.dart';
+import '8.dart'; // 8.dart 파일을 정확히 import
+
 void main() {
   runApp(MyApp());
 }
@@ -21,14 +22,15 @@ class SuccessInputScreen extends StatefulWidget {
 
 class _SuccessInputScreen extends State<SuccessInputScreen> {
   final TextEditingController _controller = TextEditingController();
-  bool _isButtonEnabled = false;
+  bool _isButtonEnabled = true;
+  bool _isHovered = false;
 
   @override
   void initState() {
     super.initState();
     _controller.addListener(() {
       setState(() {
-        _isButtonEnabled = _controller.text.length >= 2;
+       // _isButtonEnabled = _controller.text.length >= 2;
       });
     });
   }
@@ -75,27 +77,26 @@ class _SuccessInputScreen extends State<SuccessInputScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            
             SizedBox(height: 40),
             MouseRegion(
-              onEnter: (event) => _changeButtonColor(true),
-              onExit: (event) => _changeButtonColor(false),
+              onEnter: (event) => _changeHoverState(true),
+              onExit: (event) => _changeHoverState(false),
               child: ElevatedButton(
-                onPressed: _isButtonEnabled
-                    ? () {
-                   Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>
-                    RideInputPage()),
-                  );
-                        // "다음" 버튼 동작
-                        print('이름: ${_controller.text}');
+                onPressed: 
+                     (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>
+                           RideInputPage()),
+                        );
                       }
-                    : null,
+                    ,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _isButtonEnabled
-                      ? Colors.blue // 활성화된 상태
-                      : Colors.blueGrey[100], // 비활성화된 상태
+                  backgroundColor: _isHovered
+                      ? Colors.blue // 마우스 호버 시
+                      : (_isButtonEnabled
+                          ? Colors.blue // 버튼 활성화 시
+                          : Colors.blueGrey[100]), // 버튼 비활성화 시
                   padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -105,7 +106,9 @@ class _SuccessInputScreen extends State<SuccessInputScreen> {
                   '다음',
                   style: TextStyle(
                     fontSize: 18,
-                    color: _isButtonEnabled ? Colors.white : Colors.grey,
+                    color: _isHovered || _isButtonEnabled
+                        ? Colors.white
+                        : Colors.grey,
                   ),
                 ),
               ),
@@ -116,9 +119,9 @@ class _SuccessInputScreen extends State<SuccessInputScreen> {
     );
   }
 
-  void _changeButtonColor(bool hover) {
+  void _changeHoverState(bool hover) {
     setState(() {
-      _isButtonEnabled = hover || _controller.text.length >= 2;
+      _isHovered = hover;
     });
   }
 }

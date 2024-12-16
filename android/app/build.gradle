@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.flutter_moata"
+    namespace = "com.example.moata"
     compileSdkVersion 34  // 명시적으로 추가
     ndkVersion = "27.0.12077973" // NDK 버전 명시적으로 추가
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.flutter_moata"
+        applicationId = "com.example.moata"
         minSdkVersion 23  // 명시적으로 추가
         targetSdkVersion 34  // 명시적으로 추가
         versionCode = flutter.versionCode

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart'; // 네이버 지도 패키지 import
 
 class RideInputPage extends StatefulWidget {
   const RideInputPage({Key? key}) : super(key: key);
@@ -54,14 +55,22 @@ class _RideInputPageState extends State<RideInputPage> {
         children: [
           // 지도 영역
           Positioned.fill(
-            child: Container(
-              color: Colors.blueAccent,
-              child: const Center(
-                child: Text(
-                  '지도 영역 (여기에 지도 위젯 추가)',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+            child: NaverMap(
+              options: const NaverMapViewOptions(
+                initialCameraPosition: NCameraPosition(
+                  target: NLatLng(37.5666102, 126.9783881), // 서울 시청 좌표
+                  zoom: 14,
                 ),
+                mapType: NMapType.basic,
               ),
+              onMapReady: (controller) async {
+                print("네이버 맵이 준비되었습니다!");
+                // 현재 위치 추적 모드 활성화
+                await controller.setLocationTrackingMode(NLocationTrackingMode.follow);
+              },
+              onMapTapped: (point, latLng) {
+                print("지도 클릭: $latLng");
+              },
             ),
           ),
           // 하단 입력 창

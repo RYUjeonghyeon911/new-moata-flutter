@@ -1,55 +1,78 @@
 import 'package:flutter/material.dart';
 
-class RouteRegistrationPage extends StatelessWidget {
-  final String startLocation;
-  final String destinationLocation;
-  final String departureTime;
+class RouteRegistrationPage extends StatefulWidget {
+  final String startLocation; // \u출발지
+  final String destinationLocation; // 도착지
+  final String departureTime; // 출발 시간
+  final String? durationInSeconds; //estimatedTime; // 예상 소요 시간
+  final String? taxiFare; //estimatedCost; // 예상 금액
 
   const RouteRegistrationPage({
     Key? key,
     required this.startLocation,
     required this.destinationLocation,
     required this.departureTime,
+    this.durationInSeconds,
+    this.taxiFare//estimatedCost,
   }) : super(key: key);
+
+  @override
+  State<RouteRegistrationPage> createState() => _RouteRegistrationPageState();
+}
+
+class _RouteRegistrationPageState extends State<RouteRegistrationPage> {
+  String _selectedOption = '동성끼리'; // 기본 선택값
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('노선 등록'),
+        title: const Text(''),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '노선 정보',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            _infoCard('출발지', startLocation),
+            _buildInfoCard('출발지', widget.startLocation),
             const SizedBox(height: 12),
-            _infoCard('도착지', destinationLocation),
+            _buildInfoCard('도착지', widget.destinationLocation),
             const SizedBox(height: 12),
-            _infoCard('출발 시간', departureTime),
+            _buildInfoCard('출발 시간', widget.departureTime),
+            const SizedBox(height: 12),
+            _buildInfoCard('예상 소요 시간', widget.durationInSeconds ?? '0'),
+            const SizedBox(height: 12),
+            _buildInfoCard('예상 금액', widget.taxiFare ?? '0' ),
             const SizedBox(height: 24),
-            // 등록 버튼
+            const Text(
+              '기타',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                _buildRadioOption('동성끼리'),
+                const SizedBox(width: 16),
+                _buildRadioOption('성별무관'),
+              ],
+            ),
+            const SizedBox(height: 24),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // 등록 완료 로직 구현 (예: 저장, DB 연동 등)
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('노선이 등록되었습니다.')),
-                  );
-                  Navigator.pop(context);
+                  Navigator.pop(context); // 이전 페이지로 돌아감
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 48),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                child: const Text('노선 등록'),
+                child: const Text('노선생성', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],
@@ -58,36 +81,60 @@ class RouteRegistrationPage extends StatelessWidget {
     );
   }
 
-  // 정보 카드 위젯
-  Widget _infoCard(String title, String value) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        border: Border.all(color: Colors.grey[300]!),
+  Widget _buildInfoCard(String title, String value) {
+    return Card(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black54,
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 100,
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildRadioOption(String title) {
+    return Row(
+      children: [
+        Radio<String>(
+          value: title,
+          groupValue: _selectedOption,
+          onChanged: (String? value) {
+            setState(() {
+              _selectedOption = value!;
+            });
+          },
+          activeColor: Colors.blue,
+        ),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ],
     );
   }
 }

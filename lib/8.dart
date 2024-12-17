@@ -26,6 +26,29 @@ class _RideInputPageState extends State<RideInputPage> {
   int? _durationInSeconds; // 소요 시간 (초 단위)
   NLatLng? _midPoint; // 경로 중간 지점
 
+  // **택시 요금 계산 함수 추가**
+  double _calculateTaxiFare(int distanceInMeters, int durationInSeconds) {
+    const int baseFare = 4800; // 기본 요금 (최초 2km)
+    const int baseDistance = 2000; // 기본 거리 (2km)
+    const int farePer100m = 100; // 100m당 요금
+    const int farePer30Sec = 100; // 30초당 요금
+
+    double totalFare = baseFare.toDouble();
+
+    // 거리 요금 계산
+    if (distanceInMeters > baseDistance) {
+      int extraDistance = distanceInMeters - baseDistance;
+      totalFare += (extraDistance / 100).ceil() * farePer100m;
+    }
+
+    // 시간 요금 계산 (30초당 100원)
+    
+
+    totalFare += (durationInSeconds / 30000).ceil() * farePer30Sec;
+
+    return totalFare;
+  }
+
   Future<void> _moveToAddress(String address, {required bool isStart}) async {
     try {
       List<Location> locations = await locationFromAddress(address);
@@ -113,6 +136,9 @@ class _RideInputPageState extends State<RideInputPage> {
         final summary = route['summary'];
 
         _durationInSeconds = summary['duration'];
+        final int distance = summary['distance']; // 이동 거리 (미터)
+        double taxiFare = _calculateTaxiFare(distance, _durationInSeconds!);
+
         final List<NLatLng> routeCoords = path.map((point) => NLatLng(point[1], point[0])).toList();
         _midPoint = routeCoords[(routeCoords.length / 2).floor()];
 
@@ -120,7 +146,7 @@ class _RideInputPageState extends State<RideInputPage> {
           id: 'route_line',
           coords: routeCoords,
           color: Colors.blue,
-          width: 4,
+          width: 6,
         );
 
         final midMarker = NMarker(
@@ -128,7 +154,7 @@ class _RideInputPageState extends State<RideInputPage> {
           position: _midPoint!,
           icon: await NOverlayImage.fromWidget(
             widget: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(
                 color: Colors.blueAccent,
                 borderRadius: BorderRadius.circular(8),
@@ -141,17 +167,16 @@ class _RideInputPageState extends State<RideInputPage> {
                 ],
               ),
               child: Text(
-                "소요 시간\n${(_durationInSeconds!  / 60000).floor()}분",
-             
+                "소요 시간: ${(_durationInSeconds! / 60000).floor()}분\n택시 비용: ${taxiFare.toInt()}원",
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
-            size: const Size(150, 50),
+            size: const Size(140, 40),
             context: context,
           ),
         );
@@ -178,7 +203,8 @@ class _RideInputPageState extends State<RideInputPage> {
     }
   }
 
-  void _navigateToNextPage() {
+  // 나머지 코드는 그대로 유지됩니다.
+ void _navigateToNextPage() {
     if (!_routeDrawn) {
       _fetchAndDrawRoute();
     } else {
@@ -196,6 +222,8 @@ class _RideInputPageState extends State<RideInputPage> {
             startLocation: _startController.text,
             destinationLocation: _destinationController.text,
             departureTime: _timeController.text,
+            durationInSeconds: _durationInSeconds != null ? _durationInSeconds.toString() : '0',
+      taxiFare: _calculateTaxiFare(0, _durationInSeconds ?? 0).toStringAsFixed(0),
           ),
         ),
       );
@@ -222,7 +250,7 @@ class _RideInputPageState extends State<RideInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('출발지와 도착지 입력'),
+        title: const Text(''),
       ),
       body: Stack(
         children: [

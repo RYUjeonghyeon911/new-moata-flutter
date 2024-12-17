@@ -28,7 +28,7 @@ class _NumberInputScreenState extends State<NumberInputScreen> {
     super.initState();
     _controller.addListener(() {
       setState(() {
-        _isButtonEnabled = _controller.text.length >= 2;
+        _isButtonEnabled = _controller.text.length >= 11;
       });
     });
   }

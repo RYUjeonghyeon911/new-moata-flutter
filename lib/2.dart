@@ -29,7 +29,7 @@ class PermissionScreen extends StatelessWidget {
           },
         ),
       ),
-      backgroundColor: Colors.blue, // 배경색 설정
+      backgroundColor: Colors.white, // 배경색 설정
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -41,7 +41,7 @@ class PermissionScreen extends StatelessWidget {
                 '원활한 MOATA 사용을 위한\n접근 권한 안내입니다.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -68,7 +68,7 @@ class PermissionScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white, // 버튼 색상
+                    backgroundColor: Colors.blue, // 버튼 색상
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -77,7 +77,7 @@ class PermissionScreen extends StatelessWidget {
                   child: Text(
                     '확인',
                     style: TextStyle(
-                      color: Color(0xFF0066FF), // 버튼 텍스트 색상
+                      color: Colors.white, // 버튼 텍스트 색상
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -98,7 +98,7 @@ class PermissionScreen extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -107,7 +107,7 @@ class PermissionScreen extends StatelessWidget {
         Text(
           description,
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 14,
           ),
         ),
@@ -119,7 +119,7 @@ class PermissionScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Divider(
-        color: Colors.white,
+        color: Colors.black,
         thickness: 1,
       ),
     );

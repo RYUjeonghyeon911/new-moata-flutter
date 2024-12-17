@@ -35,6 +35,7 @@ class VerificationScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SizedBox(height: 40), // 상단 여백 추가
             Text(
               '시작해볼까요?',
               style: TextStyle(
@@ -62,27 +63,36 @@ class VerificationScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>
-                  NameInputScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // 버튼 배경 색상
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            SizedBox(height: 60), // 버튼 위의 여백을 조정
+            Center(
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => NameInputScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // 버튼 색상
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // 모서리 둥글게
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 16), // 상하 패딩 설정
+                  ),
+                  child: Text(
+                    '확인',
+                    style: TextStyle(
+                      color: Colors.white, // 버튼 텍스트 색상
+                      fontSize: 16, // 글자 크기
+                      fontWeight: FontWeight.bold, // 글자 굵기
+                    ),
+                  ),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: Text(
-                '확인',
-                style: TextStyle(fontSize: 18),
               ),
             ),
+            SizedBox(height: 40), // 하단 여백 추가
           ],
         ),
       ),

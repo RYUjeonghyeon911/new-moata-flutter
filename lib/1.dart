@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '2.dart'; // lib 디렉토리 내에 있는 2.dart 파일을 import
 
@@ -50,11 +49,11 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.white,
         toolbarHeight: 0, // Hide the AppBar
       ),
       body: Container(
-        color: Colors.blue,
+        color: Colors.white,
         padding: EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +62,7 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
             Text(
               '원활한 MOATA 사용을 위한\n서비스 약관에 동의해 주세요.',
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -80,7 +79,7 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                 Expanded(
                   child: Text(
                     '모두 동의합니다.',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Colors.black, fontSize: 16),
                   ),
                 ),
               ],
@@ -89,10 +88,10 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
               padding: const EdgeInsets.only(left: 40.0),
               child: Text(
                 '전체 동의는 필수 및 선택 정보에 대한 동의가 포함되어 있으며, 개별적으로 동의가 가능합니다.',
-                style: TextStyle(color: Colors.white, fontSize: 12),
+                style: TextStyle(color: Colors.black, fontSize: 12),
               ),
             ),
-            Divider(color: Colors.white),
+            Divider(color: Colors.black),
             Expanded(
               child: ListView(
                 children: [
@@ -153,31 +152,43 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                     padding: const EdgeInsets.only(left: 40.0),
                     child: Text(
                       '모아타에서 제공하는 이벤트 및 소식 등을 SMS, 이메일, 앱 내 알림 등으로 받겠습니다.',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(color: Colors.black, fontSize: 12),
                     ),
                   ),
                 ],
               ),
             ),
             Center(
-              child: ElevatedButton(
-                onPressed: (is14Above && termsChecked && locationChecked && personalInfoChecked)
-                    ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => PermissionScreen()), // SecondScreen은 2.dart에 정의된 클래스
-                        );
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(horizontal: 120, vertical: 15),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: (is14Above && termsChecked && locationChecked && personalInfoChecked)
+                      ? () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => PermissionScreen()),
+                          );
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // 버튼 배경 색상
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // 버튼 모서리 둥글게
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 16), // 버튼 내부 여백
+                  ),
+                  child: Text(
+                    '확인',
+                    style: TextStyle(
+                      color: Colors.white, // 텍스트 색상
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                child: Text('확인', style: TextStyle(fontSize: 16)),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 140),
           ],
         ),
       ),
@@ -194,13 +205,13 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
         Expanded(
           child: Text(
             text,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: Colors.black, fontSize: 16),
           ),
         ),
         if (hasArrow)
           Icon(
             Icons.arrow_forward_ios,
-            color: Colors.white,
+            color: Colors.black,
             size: 16,
           ),
       ],

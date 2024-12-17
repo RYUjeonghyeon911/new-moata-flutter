@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geocoding/geocoding.dart';
+import '9.dart';
 
 class RideInputPage extends StatefulWidget {
   const RideInputPage({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class _RideInputPageState extends State<RideInputPage> {
   NMarker? _startMarker;
   NMarker? _destinationMarker;
   NPolylineOverlay? _routeLine; // 경로선
+  bool _routeDrawn = false; // 경로가 그려졌는지 확인
 
   Future<void> _moveToAddress(String address, {required bool isStart}) async {
     try {
@@ -86,11 +88,6 @@ class _RideInputPageState extends State<RideInputPage> {
     final startPosition = _startMarker!.position;
     final destinationPosition = _destinationMarker!.position;
 
-      // 기존 경로선 제거
-    //if (_routeLine != null) {
-      //_mapController.deleteOverlay(NOverlayInfo(type: NOverlayType.polyline, id: _routeLine!.info.id));
-    //}
-
     // 경로선 생성
     final polyline = NPolylineOverlay(
       id: 'route_line',
@@ -102,11 +99,37 @@ class _RideInputPageState extends State<RideInputPage> {
     setState(() {
       _routeLine = polyline;
       _mapController.addOverlay(polyline);
+      _routeDrawn = true; // 경로가 그려졌음을 표시
     });
 
     // 출발지와 도착지를 모두 포함하는 화면 이동
     final bounds = NLatLngBounds.from([startPosition, destinationPosition]);
     await _mapController.updateCamera(NCameraUpdate.fitBounds(bounds));
+  }
+
+  void _navigateToNextPage() {
+    if (!_routeDrawn) {
+      _drawRoute(); // 경로가 그려지지 않았다면 먼저 경로를 그림
+    } else {
+      if (_timeController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("출발 시간을 입력해 주세요.")),
+        );
+        return;
+      }
+
+      // 경로가 이미 그려져 있으면 다음 페이지로 이동
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RouteRegistrationPage(
+            startLocation: _startController.text,
+            destinationLocation: _destinationController.text,
+            departureTime: _timeController.text,
+          ),
+        ),
+      );
+    }
   }
 
   void _resetInputs() {
@@ -119,6 +142,7 @@ class _RideInputPageState extends State<RideInputPage> {
       _startMarker = null;
       _destinationMarker = null;
       _routeLine = null;
+      _routeDrawn = false;
     });
   }
 
@@ -130,7 +154,6 @@ class _RideInputPageState extends State<RideInputPage> {
       ),
       body: Stack(
         children: [
-          // 네이버 지도
           Positioned.fill(
             child: NaverMap(
               options: const NaverMapViewOptions(
@@ -144,7 +167,6 @@ class _RideInputPageState extends State<RideInputPage> {
               },
             ),
           ),
-          // 입력 필드 및 버튼
           Positioned(
             bottom: 0,
             left: 0,
@@ -165,7 +187,6 @@ class _RideInputPageState extends State<RideInputPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 출발지 입력
                   TextField(
                     controller: _startController,
                     decoration: const InputDecoration(
@@ -176,7 +197,6 @@ class _RideInputPageState extends State<RideInputPage> {
                     onSubmitted: (value) => _moveToAddress(value, isStart: true),
                   ),
                   const SizedBox(height: 12),
-                  // 도착지 입력
                   TextField(
                     controller: _destinationController,
                     decoration: const InputDecoration(
@@ -187,7 +207,6 @@ class _RideInputPageState extends State<RideInputPage> {
                     onSubmitted: (value) => _moveToAddress(value, isStart: false),
                   ),
                   const SizedBox(height: 12),
-                  // 출발 시간 입력
                   TextField(
                     controller: _timeController,
                     decoration: const InputDecoration(
@@ -198,7 +217,6 @@ class _RideInputPageState extends State<RideInputPage> {
                     keyboardType: TextInputType.datetime,
                   ),
                   const SizedBox(height: 16),
-                  // 취소 및 확인 버튼
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -211,12 +229,12 @@ class _RideInputPageState extends State<RideInputPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: _drawRoute,
+                          onPressed: _navigateToNextPage,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
                             foregroundColor: Colors.white,
                           ),
-                          child: const Text('확인'),
+                          child: const Text('다음'),
                         ),
                       ),
                     ],

@@ -23,6 +23,8 @@ class _RideInputPageState extends State<RideInputPage> {
   NMarker? _destinationMarker;
   NPolylineOverlay? _routeLine; // 경로선
   bool _routeDrawn = false; // 경로가 그려졌는지 확인
+  int? _durationInSeconds; // 소요 시간 (초 단위)
+  NLatLng? _midPoint; // 경로 중간 지점
 
   Future<void> _moveToAddress(String address, {required bool isStart}) async {
     try {
@@ -90,26 +92,29 @@ class _RideInputPageState extends State<RideInputPage> {
     final destinationPosition = _destinationMarker!.position;
 
     try {
-      // Directions API 요청 URL
       final String baseUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving";
       final String url =
-          "$baseUrl?start=${startPosition.longitude},${startPosition.latitude}&goal=${destinationPosition.longitude},${destinationPosition.latitude}&option=trafast";
+          "$baseUrl?start=${startPosition.longitude},${startPosition.latitude}&goal=${destinationPosition.longitude},${destinationPosition.latitude}&option=traoptimal";
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          "X-NCP-APIGW-API-KEY-ID": "v2dyhbtaq4",
-          "X-NCP-APIGW-API-KEY": "o0cMSfneFAhgulLXyUcl5DyxecfFUEIX23aJLkZ3",
-        },
-      );
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              "X-NCP-APIGW-API-KEY-ID": "v2dyhbtaq4",
+              "X-NCP-APIGW-API-KEY": "o0cMSfneFAhgulLXyUcl5DyxecfFUEIX23aJLkZ3",
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final decodedData = json.decode(response.body);
-        final List<dynamic> path = decodedData['route']['trafast'][0]['path'];
+        final route = decodedData['route']['traoptimal'][0];
+        final List<dynamic> path = route['path'];
+        final summary = route['summary'];
 
-        final List<NLatLng> routeCoords = path
-            .map((point) => NLatLng(point[1], point[0]))
-            .toList();
+        _durationInSeconds = summary['duration'];
+        final List<NLatLng> routeCoords = path.map((point) => NLatLng(point[1], point[0])).toList();
+        _midPoint = routeCoords[(routeCoords.length / 2).floor()];
 
         final polyline = NPolylineOverlay(
           id: 'route_line',
@@ -118,9 +123,43 @@ class _RideInputPageState extends State<RideInputPage> {
           width: 4,
         );
 
+        final midMarker = NMarker(
+          id: 'mid_marker',
+          position: _midPoint!,
+          icon: await NOverlayImage.fromWidget(
+            widget: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                "소요 시간\n${(_durationInSeconds!  / 60000).floor()}분",
+             
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            size: const Size(150, 50),
+            context: context,
+          ),
+        );
+
         setState(() {
           _routeLine = polyline;
           _mapController.addOverlay(polyline);
+          _mapController.addOverlay(midMarker);
           _routeDrawn = true;
         });
 
@@ -141,7 +180,7 @@ class _RideInputPageState extends State<RideInputPage> {
 
   void _navigateToNextPage() {
     if (!_routeDrawn) {
-      _fetchAndDrawRoute(); // Directions 5를 통해 도로 경로를 그립니다.
+      _fetchAndDrawRoute();
     } else {
       if (_timeController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -174,6 +213,8 @@ class _RideInputPageState extends State<RideInputPage> {
       _destinationMarker = null;
       _routeLine = null;
       _routeDrawn = false;
+      _durationInSeconds = null;
+      _midPoint = null;
     });
   }
 
@@ -207,13 +248,7 @@ class _RideInputPageState extends State<RideInputPage> {
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, -2),
-                  ),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, -2))],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -222,7 +257,6 @@ class _RideInputPageState extends State<RideInputPage> {
                     controller: _startController,
                     decoration: const InputDecoration(
                       labelText: '출발지 입력',
-                      hintText: '출발지를 입력하세요',
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (value) => _moveToAddress(value, isStart: true),
@@ -232,7 +266,6 @@ class _RideInputPageState extends State<RideInputPage> {
                     controller: _destinationController,
                     decoration: const InputDecoration(
                       labelText: '도착지 입력',
-                      hintText: '도착지를 입력하세요',
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (value) => _moveToAddress(value, isStart: false),
@@ -242,31 +275,19 @@ class _RideInputPageState extends State<RideInputPage> {
                     controller: _timeController,
                     decoration: const InputDecoration(
                       labelText: '출발 시간 입력',
-                      hintText: '출발 시간을 입력하세요',
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.datetime,
                   ),
                   const SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: OutlinedButton(
-                          onPressed: _resetInputs,
-                          child: const Text('취소'),
-                        ),
+                        child: OutlinedButton(onPressed: _resetInputs, child: const Text('취소')),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: _navigateToNextPage,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text('다음'),
-                        ),
+                        child: ElevatedButton(onPressed: _navigateToNextPage, child: const Text('다음')),
                       ),
                     ],
                   ),

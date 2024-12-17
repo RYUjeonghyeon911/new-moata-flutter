@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '9.dart';
 
 class RideInputPage extends StatefulWidget {
@@ -76,7 +78,7 @@ class _RideInputPageState extends State<RideInputPage> {
     }
   }
 
-  void _drawRoute() async {
+  Future<void> _fetchAndDrawRoute() async {
     if (_startMarker == null || _destinationMarker == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("출발지와 도착지를 모두 입력해 주세요.")),
@@ -84,32 +86,62 @@ class _RideInputPageState extends State<RideInputPage> {
       return;
     }
 
-    // 출발지와 도착지 좌표 가져오기
     final startPosition = _startMarker!.position;
     final destinationPosition = _destinationMarker!.position;
 
-    // 경로선 생성
-    final polyline = NPolylineOverlay(
-      id: 'route_line',
-      coords: [startPosition, destinationPosition],
-      color: Colors.red,
-      width: 4,
-    );
+    try {
+      // Directions API 요청 URL
+      final String baseUrl = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving";
+      final String url =
+          "$baseUrl?start=${startPosition.longitude},${startPosition.latitude}&goal=${destinationPosition.longitude},${destinationPosition.latitude}&option=trafast";
 
-    setState(() {
-      _routeLine = polyline;
-      _mapController.addOverlay(polyline);
-      _routeDrawn = true; // 경로가 그려졌음을 표시
-    });
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "X-NCP-APIGW-API-KEY-ID": "v2dyhbtaq4",
+          "X-NCP-APIGW-API-KEY": "o0cMSfneFAhgulLXyUcl5DyxecfFUEIX23aJLkZ3",
+        },
+      );
 
-    // 출발지와 도착지를 모두 포함하는 화면 이동
-    final bounds = NLatLngBounds.from([startPosition, destinationPosition]);
-    await _mapController.updateCamera(NCameraUpdate.fitBounds(bounds));
+      if (response.statusCode == 200) {
+        final decodedData = json.decode(response.body);
+        final List<dynamic> path = decodedData['route']['trafast'][0]['path'];
+
+        final List<NLatLng> routeCoords = path
+            .map((point) => NLatLng(point[1], point[0]))
+            .toList();
+
+        final polyline = NPolylineOverlay(
+          id: 'route_line',
+          coords: routeCoords,
+          color: Colors.blue,
+          width: 4,
+        );
+
+        setState(() {
+          _routeLine = polyline;
+          _mapController.addOverlay(polyline);
+          _routeDrawn = true;
+        });
+
+        final bounds = NLatLngBounds.from(routeCoords);
+        await _mapController.updateCamera(NCameraUpdate.fitBounds(bounds));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("경로를 가져오는 데 실패했습니다.")),
+        );
+      }
+    } catch (e) {
+      print("경로 가져오기 오류: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("경로 요청 중 오류가 발생했습니다.")),
+      );
+    }
   }
 
   void _navigateToNextPage() {
     if (!_routeDrawn) {
-      _drawRoute(); // 경로가 그려지지 않았다면 먼저 경로를 그림
+      _fetchAndDrawRoute(); // Directions 5를 통해 도로 경로를 그립니다.
     } else {
       if (_timeController.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -118,7 +150,6 @@ class _RideInputPageState extends State<RideInputPage> {
         return;
       }
 
-      // 경로가 이미 그려져 있으면 다음 페이지로 이동
       Navigator.push(
         context,
         MaterialPageRoute(

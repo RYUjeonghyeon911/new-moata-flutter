@@ -5,8 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '9.dart';
 
-class RideInputPage extends StatefulWidget {
-  const RideInputPage({Key? key}) : super(key: key);
+class RideInputPage extends StatefulWidget {const RideInputPage({Key? key}) : super(key: key);
 
   @override
   State<RideInputPage> createState() => _RideInputPageState();
@@ -38,13 +37,13 @@ class _RideInputPageState extends State<RideInputPage> {
     // 거리 요금 계산
     if (distanceInMeters > baseDistance) {
       int extraDistance = distanceInMeters - baseDistance;
-      totalFare += (extraDistance / 100).ceil() * farePer100m;
+      totalFare += (extraDistance / 100).ceil() * farePer100m;//얘도 아닌듯듯
     }
 
     // 시간 요금 계산 (30초당 100원)
     
 
-    totalFare += (durationInSeconds / 30000).ceil() * farePer30Sec;
+    totalFare += (durationInSeconds / 30000).ceil() * farePer30Sec;//얜 아님
 
     return totalFare;
   }
@@ -223,7 +222,7 @@ class _RideInputPageState extends State<RideInputPage> {
             destinationLocation: _destinationController.text,
             departureTime: _timeController.text,
             durationInSeconds: _durationInSeconds != null ? _durationInSeconds.toString() : '0',
-      taxiFare: _calculateTaxiFare(0, _durationInSeconds ?? 0).toStringAsFixed(0),
+            totalFare: _calculateTaxiFare(0, _durationInSeconds ?? 0).toStringAsFixed(0),//원래 taxifare임임
           ),
         ),
       );
@@ -279,48 +278,153 @@ class _RideInputPageState extends State<RideInputPage> {
                 boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, -2))],
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _startController,
-                    decoration: const InputDecoration(
-                      labelText: '출발지 입력',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (value) => _moveToAddress(value, isStart: true),
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    // 출발지 입력
+    Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _startController,
+        decoration: InputDecoration(
+          hintText: '출발지 입력',
+          prefixIcon: const Icon(Icons.location_on, color: Colors.blue),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(16),
+        ),
+        onSubmitted: (value) => _moveToAddress(value, isStart: true),
+      ),
+    ),
+
+    // 도착지 입력
+    Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _destinationController,
+        decoration: InputDecoration(
+          hintText: '도착지 입력',
+          prefixIcon: const Icon(Icons.flag, color: Colors.red),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(16),
+        ),
+        onSubmitted: (value) => _moveToAddress(value, isStart: false),
+      ),
+    ),
+
+    // 출발 시간 입력
+    Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _timeController,
+        decoration: InputDecoration(
+          hintText: '출발 시간 입력',
+          prefixIcon: const Icon(Icons.access_time, color: Colors.green),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(16),
+        ),
+        keyboardType: TextInputType.datetime,
+      ),
+    ),
+
+    // 버튼 Row
+    Row(
+      children: [
+        // 취소 버튼
+        Expanded(
+          child: GestureDetector(
+            onTap: _resetInputs,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.redAccent, width: 1.5),
+              ),
+              child: const Center(
+                child: Text(
+                  '취소',
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _destinationController,
-                    decoration: const InputDecoration(
-                      labelText: '도착지 입력',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (value) => _moveToAddress(value, isStart: false),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _timeController,
-                    decoration: const InputDecoration(
-                      labelText: '출발 시간 입력',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.datetime,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(onPressed: _resetInputs, child: const Text('취소')),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(onPressed: _navigateToNextPage, child: const Text('다음')),
-                      ),
-                    ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // 다음 버튼
+        Expanded(
+          child: GestureDetector(
+            onTap: _navigateToNextPage,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4A90E2), Color(0xFF6D5DF6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blueAccent.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
+              child: const Center(
+                child: Text(
+                  '다음',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  ],
+),
+
             ),
           ),
         ],

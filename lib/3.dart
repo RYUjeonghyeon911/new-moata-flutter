@@ -9,6 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: WelcomeScreen(),
     );
   }
@@ -20,36 +21,40 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);//이전화면으로 이동
+            Navigator.pop(context); // 이전 화면으로 이동
           },
         ),
       ),
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Text(
-              "WELCOME",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "WELCOME",
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            Text(
-              "반가워요~",
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.grey[600],
+              SizedBox(height: 8),
+              Text(
+                "반가워요~",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey[600],
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: RichText(
+              SizedBox(height: 16),
+              RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text: "웰컴 포인트 ",
@@ -76,46 +81,46 @@ class WelcomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            LoginButton(
-              text: "Google로 로그인",
-              color: Colors.white,
-              textColor: Colors.black,
-              icon: Icons.email,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => VerificationScreen()),
-                );
-              },
-            ),
-            LoginButton(
-              text: "카카오톡으로 로그인",
-              color: Colors.yellow,
-              textColor: Colors.black,
-              icon: Icons.chat,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => VerificationScreen()),
-                );
-              },
-            ),
-            LoginButton(
-              text: "Apple로 로그인",
-              color: Colors.black,
-              textColor: Colors.white,
-              icon: Icons.apple,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => VerificationScreen()),
-                );
-              },
-            ),
-            SizedBox(height: 20),
-          ],
+              SizedBox(height: 24),
+              LoginButton(
+                text: "Google로 로그인",
+                color: Colors.white,
+                textColor: Colors.black,
+                icon: Icons.email,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => VerificationScreen()),
+                  );
+                },
+              ),
+              LoginButton(
+                text: "카카오톡으로 로그인",
+                color: Color(0xFFFFE500),
+                textColor: Colors.black,
+                icon: Icons.chat,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => VerificationScreen()),
+                  );
+                },
+              ),
+              LoginButton(
+                text: "Apple로 로그인",
+                color: Colors.black,
+                textColor: Colors.white,
+                icon: Icons.apple,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => VerificationScreen()),
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -127,33 +132,38 @@ class LoginButton extends StatelessWidget {
   final Color color;
   final Color textColor;
   final IconData icon;
-  final VoidCallback? onPressed; // onPressed 추가
+  final VoidCallback? onPressed;
 
   const LoginButton({
     required this.text,
     required this.color,
     required this.textColor,
     required this.icon,
-    this.onPressed, // onPressed를 생성자에 추가
+    this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ElevatedButton.icon(
-        onPressed: onPressed, // 전달받은 onPressed를 사용
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           minimumSize: Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(12.0),
           ),
+          elevation: 2,
         ),
         icon: Icon(icon, color: textColor),
         label: Text(
           text,
-          style: TextStyle(color: textColor, fontSize: 16),
+          style: TextStyle(
+            color: textColor,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

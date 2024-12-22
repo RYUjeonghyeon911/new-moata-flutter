@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '3.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -8,7 +9,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
       debugShowCheckedModeBanner: false,
       home: PermissionScreen(),
     );
@@ -21,15 +21,15 @@ class PermissionScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); //이전화면으로 이동
+            Navigator.pop(context); // 이전 화면으로 이동
           },
         ),
       ),
-      backgroundColor: Colors.white, // 배경색 설정
+      backgroundColor: Colors.grey[100], // 배경색 설정
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -42,19 +42,40 @@ class PermissionScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
                 ),
               ),
             ),
-            SizedBox(height: 40),
-            _buildPermissionItem('위치', '출발지 및 도착지 설정에 사용됩니다.'),
+            SizedBox(height: 30),
+            _buildPermissionItem(
+              icon: Icons.location_on,
+              title: '위치',
+              description: '출발지 및 도착지 설정에 사용됩니다.',
+              iconColor: Colors.red,
+            ),
             _buildDivider(),
-            _buildPermissionItem('전화', '원활한 연락을 수신·발신하기 위해 필요합니다.'),
+            _buildPermissionItem(
+              icon: Icons.phone,
+              title: '전화',
+              description: '원활한 연락을 수신·발신하기 위해 필요합니다.',
+              iconColor: Colors.green,
+            ),
             _buildDivider(),
-            _buildPermissionItem('미디어 파일', '프로필 관리를 위해 필요합니다.'),
+            _buildPermissionItem(
+              icon: Icons.folder,
+              title: '미디어 파일',
+              description: '프로필 관리를 위해 필요합니다.',
+              iconColor: Colors.orange,
+            ),
             _buildDivider(),
-            _buildPermissionItem('카메라', '결제 카드 스캔 및 프로필 관리를 위해 필요합니다.'),
+            _buildPermissionItem(
+              icon: Icons.camera_alt,
+              title: '카메라',
+              description: '결제 카드 스캔 및 프로필 관리를 위해 필요합니다.',
+              iconColor: Colors.purple,
+            ),
             SizedBox(height: 40),
             Center(
               child: SizedBox(
@@ -68,16 +89,16 @@ class PermissionScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // 버튼 색상
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: Text(
                     '확인',
                     style: TextStyle(
-                      color: Colors.white, // 버튼 텍스트 색상
+                      color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -91,24 +112,41 @@ class PermissionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPermissionItem(String title, String description) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildPermissionItem({
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color iconColor,
+  }) {
+    return Row(
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+        CircleAvatar(
+          radius: 24,
+          backgroundColor: iconColor.withOpacity(0.2),
+          child: Icon(icon, color: iconColor, size: 24),
         ),
-        SizedBox(height: 8),
-        Text(
-          description,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 14,
+        SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                description,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -119,12 +157,11 @@ class PermissionScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Divider(
-        color: Colors.black,
+        color: Colors.grey[300],
         thickness: 1,
       ),
     );
   }
 }
-
 
 

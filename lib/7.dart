@@ -30,7 +30,7 @@ class _SuccessInputScreen extends State<SuccessInputScreen> {
     super.initState();
     _controller.addListener(() {
       setState(() {
-       // _isButtonEnabled = _controller.text.length >= 2;
+        // _isButtonEnabled = _controller.text.length >= 2;
       });
     });
   }
@@ -53,67 +53,67 @@ class _SuccessInputScreen extends State<SuccessInputScreen> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 50),
-            Text(
-              '본인확인이 완료되었습니다.',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+      body: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 20),
+              Text(
+                '본인확인이 완료되었습니다.',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 15),
-            Text(
-              '이제 모아타와 함께 떠나볼까요?',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey[800],
+              SizedBox(height: 15),
+              Text(
+                '이제 모아타와 함께 떠나볼까요?',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 40),
-            MouseRegion(
-              onEnter: (event) => _changeHoverState(true),
-              onExit: (event) => _changeHoverState(false),
-              child: ElevatedButton(
-                onPressed: 
-                     (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>
-                           RideInputPage()),
-                        );
-                      }
-                    ,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _isHovered
-                      ? Colors.blue // 마우스 호버 시
-                      : (_isButtonEnabled
-                          ? Colors.blue // 버튼 활성화 시
-                          : Colors.blueGrey[100]), // 버튼 비활성화 시
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              SizedBox(height: 40),
+              MouseRegion(
+                onEnter: (event) => _changeHoverState(true),
+                onExit: (event) => _changeHoverState(false),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RideInputPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isHovered
+                        ? Colors.blue // 마우스 호버 시
+                        : (_isButtonEnabled
+                            ? Colors.blue // 버튼 활성화 시
+                            : Colors.blueGrey[100]), // 버튼 비활성화 시
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    '다음',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: _isHovered || _isButtonEnabled
+                          ? Colors.white
+                          : Colors.grey,
+                    ),
                   ),
                 ),
-                child: Text(
-                  '다음',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: _isHovered || _isButtonEnabled
-                        ? Colors.white
-                        : Colors.grey,
-                  ),
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

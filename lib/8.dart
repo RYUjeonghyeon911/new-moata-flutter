@@ -333,30 +333,46 @@ class _RideInputPageState extends State<RideInputPage> {
     ),
 
     // 출발 시간 입력
-    Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
+  // 출발 시간 입력
+Container(
+  margin: const EdgeInsets.only(bottom: 16),
+  decoration: BoxDecoration(
+    color: Colors.grey[100],
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black12,
+        blurRadius: 4,
+        offset: Offset(0, 2),
       ),
-      child: TextField(
-        controller: _timeController,
-        decoration: InputDecoration(
-          hintText: '출발 시간 입력',
-          prefixIcon: const Icon(Icons.access_time, color: Colors.green),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
-        ),
-        keyboardType: TextInputType.datetime,
-      ),
+    ],
+  ),
+  child: TextField(
+    controller: _timeController,
+    readOnly: true, // 직접 입력을 막음
+    decoration: InputDecoration(
+      hintText: '출발 시간 선택',
+      prefixIcon: const Icon(Icons.access_time, color: Colors.green),
+      border: InputBorder.none,
+      contentPadding: const EdgeInsets.all(16),
     ),
+    onTap: () async {
+      // Time Picker 호출
+      final TimeOfDay? selectedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(), // 기본값: 현재 시간
+      );
+
+      if (selectedTime != null) {
+        setState(() {
+          // 선택한 시간을 TextField에 표시
+          _timeController.text = selectedTime.format(context);
+        });
+      }
+    },
+  ),
+),
+
 
     // 버튼 Row
     Row(
@@ -370,7 +386,7 @@ class _RideInputPageState extends State<RideInputPage> {
               decoration: BoxDecoration(
                 color: Colors.red[50],
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.redAccent, width: 1.5),
+                border: Border.all(color: Colors.red, width: 1.5),
               ),
               child: const Center(
                 child: Text(

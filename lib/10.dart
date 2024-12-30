@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
-
+import '11.dart';
 class CostSharingPage extends StatefulWidget {
-  final String totalFare; // 9.dart에서 전달받은 총 비용
+  
+  final String totalFare; // 이전 화면에서 전달받은 총 비용
+  final String durationInSeconds; // 예상 소요 시간
+   final String startLocation; // 출발지
+  final String destinationLocation; // 도착지
 
   const CostSharingPage({
     Key? key,
     required this.totalFare,
+    required this.durationInSeconds,
+     required this.startLocation,
+    required this.destinationLocation,
+    
   }) : super(key: key);
 
   @override
@@ -32,6 +40,12 @@ class _CostSharingPageState extends State<CostSharingPage> {
     });
   }
 
+  String _formatDuration(String durationInSeconds) {
+    int seconds = int.tryParse(durationInSeconds) ?? 0;
+    int minutes = (seconds / 60000).ceil();
+    return '${minutes}분';
+  }
+
   void _toggleSuggestion(String suggestion) {
     setState(() {
       if (_selectedSuggestions.contains(suggestion)) {
@@ -44,12 +58,111 @@ class _CostSharingPageState extends State<CostSharingPage> {
     });
   }
 
+  void _showConfirmationBanner() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '노선을 등록하시겠습니까?',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                 '${widget.startLocation} <-> ${widget.destinationLocation}',
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '예상 금액: ${_sharePerPerson.toString()}원',
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '예상 소요 시간: ${_formatDuration(widget.durationInSeconds)}',
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '요청사항: ${_requestController.text.isNotEmpty ? _requestController.text : "없음"}',
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // 배너 닫기
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.grey),
+                      ),
+                      child: const Text(
+                        '취소',
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // 배너 닫기
+                       _registerRoute(); // 노선 등록 함수 호출  // 등록 로직 추가
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                      ),
+                      child: const Text(
+                        '등록',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+void _registerRoute() {
+  final newRoute = {
+    'startLocation': widget.startLocation,
+    'destinationLocation': widget.destinationLocation,
+    'totalFare': widget.totalFare,
+    'duration': _formatDuration(widget.durationInSeconds),
+    'request': _requestController.text.isNotEmpty ? _requestController.text : '없음',
+  };
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => RouteListPage(
+        routes: [newRoute], // 새 노선 전달 (기존 노선과 병합 가능)
+      ),
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          '요금 분배',
+          '',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -62,7 +175,6 @@ class _CostSharingPageState extends State<CostSharingPage> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // 상단 텍스트
             Column(
               children: [
                 const Text(
@@ -86,7 +198,6 @@ class _CostSharingPageState extends State<CostSharingPage> {
               ],
             ),
             const SizedBox(height: 30),
-            // 합승 인원 선택 박스
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
@@ -120,14 +231,14 @@ class _CostSharingPageState extends State<CostSharingPage> {
                           value: _numPeople.toDouble(),
                           min: 2,
                           max: 4,
-                          divisions: 2, // 2명, 3명, 4명 선택 가능
+                          divisions: 2,
                           label: '$_numPeople명',
                           activeColor: Colors.blue,
                           inactiveColor: Colors.blue[100],
                           onChanged: (value) {
                             setState(() {
                               _numPeople = value.toInt();
-                              _calculateShares(); // 비용 재계산
+                              _calculateShares();
                             });
                           },
                         ),
@@ -146,7 +257,6 @@ class _CostSharingPageState extends State<CostSharingPage> {
               ),
             ),
             const SizedBox(height: 30),
-            // 1인당 부담 금액 및 적립 포인트 박스
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(20),
@@ -215,7 +325,6 @@ class _CostSharingPageState extends State<CostSharingPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // 요청사항 입력 필드 및 체크리스트
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
@@ -280,14 +389,10 @@ class _CostSharingPageState extends State<CostSharingPage> {
               ),
             ),
             const Spacer(),
-            // 등록 버튼
             Padding(
               padding: const EdgeInsets.all(20),
               child: ElevatedButton(
-                onPressed: () {
-                  // 요청 등록 로직
-                  Navigator.pop(context);
-                },
+                onPressed: _showConfirmationBanner,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   padding: const EdgeInsets.symmetric(vertical: 16),

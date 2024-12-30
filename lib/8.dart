@@ -4,8 +4,10 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '9.dart';
+import '11.dart';
 
-class RideInputPage extends StatefulWidget {const RideInputPage({Key? key}) : super(key: key);
+class RideInputPage extends StatefulWidget {
+  const RideInputPage({Key? key}) : super(key: key);
 
   @override
   State<RideInputPage> createState() => _RideInputPageState();
@@ -15,6 +17,8 @@ class _RideInputPageState extends State<RideInputPage> {
   final TextEditingController _startController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
+  
+
 
   late NaverMapController _mapController;
 
@@ -147,7 +151,7 @@ class _RideInputPageState extends State<RideInputPage> {
           color: Colors.blue,
           width: 6,
         );
-
+//여기서 다름름
         final midMarker = NMarker(
           id: 'mid_marker',
           position: _midPoint!,
@@ -202,7 +206,37 @@ class _RideInputPageState extends State<RideInputPage> {
     }
   }
 
-  // 나머지 코드는 그대로 유지됩니다.
+  // 메뉴버튼
+ void _showDrawer(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.add),
+                title: const Text('추가 버튼 1'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.add_circle),
+                title: const Text('추가 버튼 2'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+ }
+  //종료
  void _navigateToNextPage() {
     if (!_routeDrawn) {
       _fetchAndDrawRoute();
@@ -266,6 +300,72 @@ class _RideInputPageState extends State<RideInputPage> {
               },
             ),
           ),
+          //메뉴버튼
+// 종이비행기 버튼과 배너 관련 코드
+Positioned(
+  top: kToolbarHeight -50 , // 뒤로가기 버튼 아래 배치
+  left: 5,
+  child: GestureDetector(
+    onTap: () {
+      _showDrawer(context);
+    },
+    child: Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: const Icon(
+        Icons.menu,
+        color: Colors.black,
+        size: 30,
+      ),
+    ),
+  ),
+),
+
+
+
+          //종료
+
+ // 출발지 설정 버튼
+    Positioned(
+  top: kToolbarHeight - 5, // 메뉴 버튼 바로 밑에 배치
+  left: 5,
+  child: GestureDetector(
+    onTap: () {
+      // 출발지 설정 버튼 클릭 시 동작
+      _moveToAddress("출발지 주소를 입력하세요", isStart: true);
+    },
+    child: Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0), // 검은색 반투명 배경
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.send, // 종이비행기 아이콘
+            color: Colors.black,
+            size: 24,
+          ),
+          const SizedBox(width: 8), // 아이콘과 텍스트 간격
+          const Text(
+            "",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+      
+          //종료버튼
           Positioned(
             bottom: 0,
             left: 0,
@@ -456,3 +556,4 @@ Container(
     super.dispose();
   }
 }
+//8.dart임임

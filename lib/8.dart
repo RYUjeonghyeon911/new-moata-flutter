@@ -17,9 +17,10 @@ class _RideInputPageState extends State<RideInputPage> {
   final TextEditingController _startController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
+   final List<Map<String, String>> _routes = [];//데이터가 옮길때 안보여서 일단추가
   
 
-
+//여기까지지
   late NaverMapController _mapController;
 
   NMarker? _startMarker;
@@ -51,60 +52,64 @@ class _RideInputPageState extends State<RideInputPage> {
 
     return totalFare;
   }
+Future<void> _moveToAddress(String address, {required bool isStart}) async {
+  try {
+    // 주소를 위도, 경도로 변환
+    List<Location> locations = await locationFromAddress(address);
 
-  Future<void> _moveToAddress(String address, {required bool isStart}) async {
-    try {
-      List<Location> locations = await locationFromAddress(address);
+    if (locations.isNotEmpty) {
+      final location = locations.first;
 
-      if (locations.isNotEmpty) {
-        final location = locations.first;
+      // 지도 카메라 이동
+      await _mapController.updateCamera(
+        NCameraUpdate.withParams(
+          target: NLatLng(location.latitude, location.longitude),
+          zoom: 16,
+        ),
+      );
 
-        await _mapController.updateCamera(
-          NCameraUpdate.withParams(
-            target: NLatLng(location.latitude, location.longitude),
-            zoom: 16,
-          ),
-        );
+      // 새로운 마커 생성
+      final newMarker = NMarker(
+        id: isStart ? 'start_marker' : 'destination_marker',
+        position: NLatLng(location.latitude, location.longitude),
+        caption: NOverlayCaption(
+          text: isStart ? '출발지' : '도착지',
+          textSize: 12,
+        ),
+      );
 
-        final newMarker = NMarker(
-          id: isStart ? 'start_marker' : 'destination_marker',
-          position: NLatLng(location.latitude, location.longitude),
-          caption: NOverlayCaption(
-            text: isStart ? '출발지' : '도착지',
-            textSize: 12,
-          ),
-        );
-
-        setState(() {
-          if (isStart) {
-            if (_startMarker != null) {
-              _mapController.deleteOverlay(
-                NOverlayInfo(type: NOverlayType.marker, id: _startMarker!.info.id),
-              );
-            }
-            _startMarker = newMarker;
-          } else {
-            if (_destinationMarker != null) {
-              _mapController.deleteOverlay(
-                NOverlayInfo(type: NOverlayType.marker, id: _destinationMarker!.info.id),
-              );
-            }
-            _destinationMarker = newMarker;
+      // 기존 마커 삭제 및 새 마커 추가
+      setState(() {
+        if (isStart) {
+          if (_startMarker != null) {
+            _mapController.deleteOverlay(
+              NOverlayInfo(type: NOverlayType.marker, id: _startMarker!.info.id),
+            );
           }
-          _mapController.addOverlay(newMarker);
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("입력한 장소를 찾을 수 없습니다.")),
-        );
-      }
-    } catch (e) {
-      print("주소 변환 실패: $e");
+          _startMarker = newMarker;
+        } else {
+          if (_destinationMarker != null) {
+            _mapController.deleteOverlay(
+              NOverlayInfo(type: NOverlayType.marker, id: _destinationMarker!.info.id),
+            );
+          }
+          _destinationMarker = newMarker;
+        }
+        _mapController.addOverlay(newMarker);
+      });
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("장소 검색 중 오류가 발생했습니다.")),
+        const SnackBar(content: Text("입력한 장소를 찾을 수 없습니다.")),
       );
     }
+  } catch (e) {
+    print("주소 변환 실패: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("장소 검색 중 오류가 발생했습니다.")),
+    );
   }
+}
+
 
   Future<void> _fetchAndDrawRoute() async {
     if (_startMarker == null || _destinationMarker == null) {
@@ -329,13 +334,20 @@ Positioned(
           //종료
 
  // 출발지 설정 버튼
-    Positioned(
+   Positioned(
   top: kToolbarHeight - 5, // 메뉴 버튼 바로 밑에 배치
   left: 5,
   child: GestureDetector(
     onTap: () {
-      // 출발지 설정 버튼 클릭 시 동작
-      _moveToAddress("출발지 주소를 입력하세요", isStart: true);
+      // RouteListPage로 이동
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RouteListPage(
+            routes: [], // 빈 데이터를 전달하거나 제거 가능
+          ),
+        ),
+      );
     },
     child: Container(
       padding: const EdgeInsets.all(12),
@@ -350,39 +362,30 @@ Positioned(
             color: Colors.black,
             size: 24,
           ),
-          const SizedBox(width: 8), // 아이콘과 텍스트 간격
-          const Text(
-            "",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     ),
-      
+  ),
+),
+
           //종료버튼
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               decoration: const BoxDecoration(
-                color: Colors.white,
+                //color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, -2))],
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 100, offset: Offset(0, -2))],
               ),
               child: Column(
   mainAxisSize: MainAxisSize.min,
   children: [
     // 출발지 입력
     Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
@@ -400,7 +403,7 @@ Positioned(
           hintText: '출발지 입력',
           prefixIcon: const Icon(Icons.location_on, color: Colors.blue),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
+          contentPadding: const EdgeInsets.all(9),
         ),
         onSubmitted: (value) => _moveToAddress(value, isStart: true),
       ),
@@ -408,7 +411,7 @@ Positioned(
 
     // 도착지 입력
     Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
@@ -426,7 +429,7 @@ Positioned(
           hintText: '도착지 입력',
           prefixIcon: const Icon(Icons.flag, color: Colors.red),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
+          contentPadding: const EdgeInsets.all(9),
         ),
         onSubmitted: (value) => _moveToAddress(value, isStart: false),
       ),
@@ -435,7 +438,7 @@ Positioned(
     // 출발 시간 입력
   // 출발 시간 입력
 Container(
-  margin: const EdgeInsets.only(bottom: 16),
+  margin: const EdgeInsets.only(bottom: 6),
   decoration: BoxDecoration(
     color: Colors.grey[100],
     borderRadius: BorderRadius.circular(12),
@@ -454,7 +457,7 @@ Container(
       hintText: '출발 시간 선택',
       prefixIcon: const Icon(Icons.access_time, color: Colors.green),
       border: InputBorder.none,
-      contentPadding: const EdgeInsets.all(16),
+      contentPadding: const EdgeInsets.all(9),
     ),
     onTap: () async {
       // Time Picker 호출
@@ -482,11 +485,11 @@ Container(
           child: GestureDetector(
             onTap: _resetInputs,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
                 color: Colors.red[50],
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.red, width: 1.5),
+                border: Border.all(color: Colors.red, width: 1),
               ),
               child: const Center(
                 child: Text(
@@ -556,4 +559,3 @@ Container(
     super.dispose();
   }
 }
-//8.dart임임

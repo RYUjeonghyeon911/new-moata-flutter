@@ -22,8 +22,6 @@ class RouteRegistrationPage extends StatefulWidget {
 }
 
 class _RouteRegistrationPageState extends State<RouteRegistrationPage> {
-  String _selectedOption = '동성끼리'; // 기본 선택값
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,42 +82,6 @@ class _RouteRegistrationPageState extends State<RouteRegistrationPage> {
               _formatCurrency(widget.totalFare ?? '0'),
               Icons.monetization_on_outlined,
             ),
-            const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '기타 옵션',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      _buildRadioOption('동성끼리'),
-                      const SizedBox(width: 16),
-                      _buildRadioOption('성별무관'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
             const Spacer(),
             // 다음 버튼
             Padding(
@@ -132,8 +94,8 @@ class _RouteRegistrationPageState extends State<RouteRegistrationPage> {
                       builder: (context) => CostSharingPage(
                         totalFare: widget.totalFare ?? '0', // 총 비용 전달
                         durationInSeconds: widget.durationInSeconds ?? '0', 
-                           startLocation: widget.startLocation, // 출발지 전달
-      destinationLocation: widget.destinationLocation, // 도착지 전달// 예상 소요 시간 전달
+                        startLocation: widget.startLocation, // 출발지 전달
+                        destinationLocation: widget.destinationLocation, // 도착지 전달
                       ),
                     ),
                   );
@@ -210,27 +172,6 @@ class _RouteRegistrationPageState extends State<RouteRegistrationPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildRadioOption(String title) {
-    return Row(
-      children: [
-        Radio<String>(
-          value: title,
-          groupValue: _selectedOption,
-          onChanged: (String? value) {
-            setState(() {
-              _selectedOption = value!;
-            });
-          },
-          activeColor: Colors.blue,
-        ),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16, color: Colors.black87),
-        ),
-      ],
     );
   }
 

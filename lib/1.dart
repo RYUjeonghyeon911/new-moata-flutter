@@ -80,7 +80,7 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                 'MOATA를 원활히 사용하려면 아래 약관에 동의해주세요.',
                 style: TextStyle(
                   color: Colors.grey[600],
-                  fontSize: 16,
+                  fontSize: 15,
                 ),
               ),
               SizedBox(height: 24),

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import '11.dart';
+
 class CostSharingPage extends StatefulWidget {
-  
   final String totalFare; // 이전 화면에서 전달받은 총 비용
   final String durationInSeconds; // 예상 소요 시간
-   final String startLocation; // 출발지
+  final String startLocation; // 출발지
   final String destinationLocation; // 도착지
 
   const CostSharingPage({
     Key? key,
     required this.totalFare,
     required this.durationInSeconds,
-     required this.startLocation,
+    required this.startLocation,
     required this.destinationLocation,
-    
   }) : super(key: key);
 
   @override
@@ -24,7 +23,13 @@ class _CostSharingPageState extends State<CostSharingPage> {
   int _numPeople = 2; // 기본 합승 인원 (2명)
   int _sharePerPerson = 0; // 1인당 부담할 금액
   final TextEditingController _requestController = TextEditingController(); // 요청사항 입력 컨트롤러
-  final List<String> _suggestions = ['조용히 가고 싶어요', '짐이 많아요', '빠르게 가고 싶어요'];
+  final List<String> _suggestions = [
+    '조용히 가고 싶어요',
+    '짐이 많아요',
+    '빠르게 가고 싶어요',
+    '동성끼리',
+    '성별무관'
+  ];
   final Set<String> _selectedSuggestions = {}; // 선택된 요청사항
 
   @override
@@ -80,7 +85,7 @@ class _CostSharingPageState extends State<CostSharingPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                 '${widget.startLocation} <-> ${widget.destinationLocation}',
+                '${widget.startLocation} <-> ${widget.destinationLocation}',
                 style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 8),
@@ -120,7 +125,7 @@ class _CostSharingPageState extends State<CostSharingPage> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context); // 배너 닫기
-                       _registerRoute(); // 노선 등록 함수 호출  // 등록 로직 추가
+                        _registerRoute(); // 노선 등록 함수 호출
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
@@ -139,24 +144,26 @@ class _CostSharingPageState extends State<CostSharingPage> {
       },
     );
   }
-void _registerRoute() {
-  final newRoute = {
-    'startLocation': widget.startLocation,
-    'destinationLocation': widget.destinationLocation,
-    'totalFare': widget.totalFare,
-    'duration': _formatDuration(widget.durationInSeconds),
-    'request': _requestController.text.isNotEmpty ? _requestController.text : '없음',
-  };
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => RouteListPage(
-        routes: [newRoute], // 새 노선 전달 (기존 노선과 병합 가능)
+  void _registerRoute() {
+    final newRoute = {
+      'startLocation': widget.startLocation,
+      'destinationLocation': widget.destinationLocation,
+      'totalFare': widget.totalFare,
+      'duration': _formatDuration(widget.durationInSeconds),
+      'request': _requestController.text.isNotEmpty ? _requestController.text : '없음',
+    };
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RouteListPage(
+          routes: [newRoute], // 새 노선 전달 (기존 노선과 병합 가능)
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
